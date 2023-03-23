@@ -218,6 +218,28 @@ def isometric_axonometry_renderer_handle_event(e: Element, event: pygame.event.E
     return False
 
 
+def flip_axis(idx):
+    global meshes
+    min_val = options['meshes'][0][0][0][0][idx]
+    max_val = min_val
+    for mesh in options['meshes']:
+        for face in mesh:
+            for tri in face:
+                for point in tri:
+                    if point[idx] > max_val:
+                        max_val = point[idx]
+                    elif point[idx] < min_val:
+                        min_val = point[idx]
+
+    for mesh in options['meshes']:
+        for face in mesh:
+            for tri in face:
+                for point in tri:
+                    point[idx] = max_val - point[idx] + min_val
+
+    meshes = [itom(mesh) for mesh in options['meshes']]
+
+
 def key_event_handler(e: Element, event: pygame.event.Event):
     global scale, only_orthogonal_proj, dark_mode
     global transparency, use_color, true_scale
@@ -254,6 +276,15 @@ def key_event_handler(e: Element, event: pygame.event.Event):
             transparency -= 15
             if transparency < 0:
                 transparency = 0
+            return True
+        elif event.key == K_x:
+            flip_axis(0)
+            return True
+        elif event.key == K_y:
+            flip_axis(1)
+            return True
+        elif event.key == K_z:
+            flip_axis(2)
             return True
     elif event.type == MOUSEWHEEL:
         true_scale += event.y * (scale / 10)

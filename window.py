@@ -6,6 +6,8 @@ from typing import Self
 class Window:
     def __init__(self) -> None:
         self.__screen = pygame.display.set_mode((1280, 720), RESIZABLE)
+        pygame.display.set_caption("Assonometrie")
+        pygame.display.set_icon(pygame.image.load("assets/icons/icon.png"))
         self.__running = True
         self.elements = {}
         self.__clock = pygame.time.Clock()
