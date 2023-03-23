@@ -1,2 +1,2 @@
-# axonometries
- Simple Axonometry viewer with python
+# Axonometries
+ Simple axonometry viewer with Python
