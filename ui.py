@@ -92,11 +92,10 @@ def size_update(e: Element):
 
 def slider_update(e: Element):
     size_update(e)
+    e.h = 5
     pos_update(e)
-    # draw.aa_rect(e.window.screen, (e.x, e.y, e.w, 5), globals.C_DETAIL_DIMMED, 2)
     draw.aa_rect(e.window.screen, (e.x, e.y - 5, e.w, 15), globals.C_DETAIL_DIMMED, 10)
     cur_w = round((e.w - 15) * e.data['value'])
-    # draw.odd_circle(e.window.screen, [cur_x + 7, e.y + 2], 7, globals.C_DETAIL)
     draw.aa_rect(e.window.screen, (e.x + 1, e.y - 4, cur_w + 13, 13), globals.C_GENERAL, 10)
     draw.aa_rect(e.window.screen, (e.x + cur_w, e.y - 5, 15, 15), globals.C_GENERAL, 10, 1, globals.C_DETAIL_DIMMED)
     e.data['set-value'](e)
@@ -118,7 +117,17 @@ def slider_handle_event(e: Element, event: pygame.event.Event):
         return True
 
 
-def image_update(e: Element):
+def recolor_icon(icon: pygame.Surface, color):
+    for x in range(icon.get_width()):
+        for y in range(icon.get_height()):
+            alpha = icon.get_at((x, y))[3]
+            icon.set_at((x, y), color[:3] + (alpha,))
+
+
+def icon_update(e: Element):
+    if e.data['color'] != e.data.get('current-color'):
+        recolor_icon(e.data['image'], e.data['color'])
+        e.data['current-color'] = e.data['color']
     e.w = e.data['image'].get_width()
     e.h = e.data['image'].get_height()
     pos_update(e)

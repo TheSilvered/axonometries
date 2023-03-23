@@ -11,8 +11,6 @@ try:
            .add_element('isometric_axonometry_renderer', isometric_axonometry_renderer
                .add_child('sliders', sliders))
            .add_element('scale-slider', scale_slider)
-           .add_element('zoom-in', zoom_in)
-           .add_element('zoom-out', zoom_out)
            .add_element('fg', fg)
            .add_element('key_event_handler', key_event_handler))
 
@@ -23,3 +21,4 @@ try:
 except Exception as e:
     with open('crash.txt', 'w') as f:
         f.write(tb.format_exc())
+    raise e

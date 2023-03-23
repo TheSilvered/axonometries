@@ -44,10 +44,8 @@ true_scale = 20
 transparency = options['settings']['transparency']
 font = pygame.font.Font('assets/fonts/Inter-Regular.ttf', 18)
 
-zoom_in_dark = pygame.image.load('assets/icons/zoom-in-dark.png')
-zoom_out_dark = pygame.image.load('assets/icons/zoom-out-dark.png')
-zoom_in_light = pygame.image.load('assets/icons/zoom-in.png')
-zoom_out_light = pygame.image.load('assets/icons/zoom-out.png')
+zoom_in = pygame.image.load('assets/icons/zoom-in.png')
+zoom_out = pygame.image.load('assets/icons/zoom-out.png')
 
 with open('assets/meshes.json', 'r') as f:
     meshes = [itom(mesh) for mesh in options['meshes']]
@@ -192,11 +190,11 @@ def isometric_axonometry_renderer_update(e: Element):
 
     e.window.screen.blit(surf, (e.window.w // 2 + 2, 0))
     e.add_child('sliders', sliders)
-    fg.data['labels']['a_label'] = [f'α: {zy:.0f}°', (e.window.w - 460, 12)]
-    fg.data['labels']['b_label'] = [f'β: {360 - yx:.0f}°', (e.window.w - 459, 32)]
-    fg.data['labels']['x_label'] = [f'x: {xm:.1f}', (e.window.w - 185, 52)]
-    fg.data['labels']['y_label'] = [f'y: {ym:.1f}', (e.window.w - 185, 72)]
-    fg.data['labels']['z_label'] = [f'z: {zm:.1f}', (e.window.w - 185, 92)]
+    fg.data['labels']['a_label'] = [f'α: {zy:.0f}°', (e.window.w - 455, 11)]
+    fg.data['labels']['b_label'] = [f'β: {360 - yx:.0f}°', (e.window.w - 454, 31)]
+    fg.data['labels']['x_label'] = [f'x: {xm:.1f}', (e.window.w - 180, 51)]
+    fg.data['labels']['y_label'] = [f'y: {ym:.1f}', (e.window.w - 180, 71)]
+    fg.data['labels']['z_label'] = [f'z: {zm:.1f}', (e.window.w - 180, 91)]
 
 
 def isometric_axonometry_renderer_handle_event(e: Element, event: pygame.event.Event):
@@ -238,6 +236,8 @@ def key_event_handler(e: Element, event: pygame.event.Event):
             for label in e.window.elements['fg'].data['labels'].values():
                 if len(label) == 3:
                     label.pop()
+            zoom_in.data['color'] = globals.C_DETAIL
+            zoom_out.data['color'] = globals.C_DETAIL
             return True
         elif event.key == K_o:
             only_orthogonal_proj = not only_orthogonal_proj
@@ -263,24 +263,6 @@ def key_event_handler(e: Element, event: pygame.event.Event):
             true_scale = 100
         scale = int(true_scale)
         return True
-
-
-def zoom_in_update(e: Element):
-    e.x = e.window.w // 2 + 115
-    e.y = e.window.h - 32
-    if dark_mode:
-        e.window.screen.blit(zoom_in_dark, (e.x, e.y))
-    else:
-        e.window.screen.blit(zoom_in_light, (e.x, e.y))
-
-
-def zoom_out_update(e: Element):
-    e.x = e.window.w // 2 - 135
-    e.y = e.window.h - 32
-    if dark_mode:
-        e.window.screen.blit(zoom_out_dark, (e.x, e.y))
-    else:
-        e.window.screen.blit(zoom_out_light, (e.x, e.y))
 
 
 bg = Element(update=bg_update)
@@ -319,7 +301,7 @@ zy_slider = Element(
         'anchor': {
             'from': 'rt',
             'to': 'rt',
-            'offset': (-20, 20)
+            'offset': (-15, 20)
         }
     }
 )
@@ -335,7 +317,7 @@ yx_slider = Element(
         'anchor': {
             'from': 'rt',
             'to': 'rt',
-            'offset': (-20, 40)
+            'offset': (-15, 40)
         }
     }
 )
@@ -351,7 +333,7 @@ xm_slider = Element(
         'anchor': {
             'from': 'rt',
             'to': 'rt',
-            'offset': (-20, 60)
+            'offset': (-15, 60)
         }
     }
 )
@@ -367,7 +349,7 @@ ym_slider = Element(
         'anchor': {
             'from': 'rt',
             'to': 'rt',
-            'offset': (-20, 80)
+            'offset': (-15, 80)
         }
     }
 )
@@ -383,15 +365,40 @@ zm_slider = Element(
         'anchor': {
             'from': 'rt',
             'to': 'rt',
-            'offset': (-20, 100)
+            'offset': (-15, 100)
         }
+    }
+)
+
+zoom_in = Element(
+    update=ui.icon_update,
+    data={
+        'anchor': {
+            'from': 'rc',
+            'to': 'lc',
+            'offset': (5, 0)
+        },
+        'image': zoom_in,
+        'color': globals.C_DETAIL
+    }
+)
+zoom_out = Element(
+    update=ui.icon_update,
+    data={
+        'anchor': {
+            'from': 'lc',
+            'to': 'rc',
+            'offset': (-5, 0)
+        },
+        'image': zoom_out,
+        'color': globals.C_DETAIL
     }
 )
 
 scale_slider = Element(
     update=ui.slider_update,
     handle_event=ui.slider_handle_event,
-    w=216, h=15,
+    w=216,
     data={
         'value': 3 / 19,
         'grabbed': False,
@@ -399,10 +406,10 @@ scale_slider = Element(
         'anchor': {
             'from': 'cb',
             'to': 'cb',
-            'offset': (0, -10)
+            'offset': (0, -15)
         }
     }
-)
+).add_child('zoom-in', zoom_in).add_child('zoom-out', zoom_out)
 
 sliders = Element(
     update=ui.container_update,
@@ -419,6 +426,3 @@ sliders = Element(
     .add_child('xm_slider', xm_slider) \
     .add_child('ym_slider', ym_slider) \
     .add_child('zm_slider', zm_slider)
-
-zoom_in = Element(update=zoom_in_update)
-zoom_out = Element(update=zoom_out_update)
